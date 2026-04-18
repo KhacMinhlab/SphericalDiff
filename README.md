@@ -58,7 +58,7 @@ Developed and tested under **Python 3.10.x**. Refer to `environment.yaml` for th
 
 **Clone and install dependencies**
 ```bash
-git clone https://github.com/<your-username>/SphericalDiff
+git clone https://github.com/KhacMinhlab/SphericalDiff
 cd SphericalDiff
 
 conda env create -f environment.yaml
