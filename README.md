@@ -4,7 +4,7 @@
 <a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
 <a href="https://hydra.cc/"><img alt="Config: Hydra" src="https://img.shields.io/badge/Config-Hydra-89b8cd"></a>
 <a href="https://e3nn.org/"><img alt="e3nn" src="https://img.shields.io/badge/Equivariance-e3nn-blue"></a>
-
+<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="License: CC BY-NC-SA 4.0" src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg"></a>
 </div>
 
 ---
@@ -17,8 +17,7 @@
 
 > *"Generating 3D drug-like molecules directly in binding pockets via SE(3)-equivariant many-body diffusion with spherical harmonic representations."*
 
-<!-- Replace the line below with your image link when ready -->
-<!-- <img src="YOUR_IMAGE_LINK_HERE" alt="SphericalDiff Architecture Overview" width="800"/> -->
+<img src="image/Abstract.png" alt="SphericalDiff Architecture Overview" width="800"/> 
 
 <video src="https://github.com/user-attachments/assets/3eeea996-c39d-4ac6-9d7c-f13b1e633a28" autoplay loop muted playsinline width="100%"></video>
 </div>
@@ -247,8 +246,18 @@ We sincerely thank all their contributors and maintainers.
 
 ## License
 
-This project is covered under the **MIT License**.
+This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License** (CC BY-NC-SA 4.0).
 
+**Under this license, you are free to:**
+* **Share**: Copy and redistribute the material in any medium or format.
+* **Adapt**: Remix, transform, and build upon the material.
+
+**Under the following terms:**
+* **Attribution**: You must give appropriate credit, provide a link to the license, and indicate if changes were made.
+* **NonCommercial**: You may not use the material for commercial purposes.
+* **ShareAlike**: If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
+
+See the [LICENSE](LICENSE.md) file for the full legal text.
 ---
 
 ## Citation
