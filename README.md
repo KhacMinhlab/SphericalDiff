@@ -19,7 +19,7 @@
 
 <img src="image/Abstract.png" alt="SphericalDiff Architecture Overview" width="800"/> 
 
-<video src="https://github.com/user-attachments/assets/3eeea996-c39d-4ac6-9d7c-f13b1e633a28" autoplay loop muted playsinline width="100%"></video>
+<video src="image\Visual.mp4" autoplay loop muted playsinline width="100%"></video>
 </div>
 
 ---
