@@ -1,0 +1,106 @@
+run_name: 'SE3-cond-CA-MCAE_EDM-scalepocket-bayes-v5'
+logdir: '/media/kenthai/Research02/ThangD21/DIFF/logs/train'
+wandb_params:
+  mode: 'online'
+  entity: 'lethang08082003-github'
+dataset: 'crossdock'
+datadir: '/media/kenthai/Research02/ThangD21/DIFF/data/data/data/processed_crossdock_noH_ca_only_temp'
+enable_progress_bar: True
+num_sanity_val_steps: 0
+
+# Training params
+mode: 'pocket_conditioning'
+pocket_representation: 'CA'
+batch_size: 32 
+lr: 1.0e-4
+n_epochs: 1000
+num_workers: 1
+gpus: 1
+clip_grad: True
+augment_rotation: False
+augment_noise: 0
+accumulate_grad_batches: 2
+
+# Loss params
+auxiliary_loss: False
+loss_params:
+  max_weight: 0.01
+  clamp_lj: 3.0
+
+use_bond_loss: False
+bond_loss_weight: 1
+
+# EGNN / MACE Architecture
+egnn_params:
+  mode: egnn_spherical
+  device: 'cuda'
+  joint_nf: 128
+  hidden_nf: 64
+  n_layers: 2
+  attention: False
+  tanh: False
+  norm_constant: 1
+  inv_sublayers: 2
+  sin_embedding: False
+  normalization_factor: 100
+  aggregation_method: 'sum'
+  reflection_equivariant: True
+
+  # Spherical harmonics specific parameters
+  lmax: 2
+  num_rbf: 16
+  max_radius: 5
+  avg_num_neighbors: 15
+  normalization: 'instance'
+  rbf: 'bessel'
+  trainable_rbf: True
+
+  block_type: 'mace'
+  max_correlation_order: 3
+
+  # Edge cutoff parameters
+  edge_cutoff_ligand: null
+  edge_cutoff_pocket: 5.0
+  edge_cutoff_interaction: 5.0
+  edge_embedding_dim: 8
+
+# --- EDM SPECIFIC PARAMETERS ---
+diffusion_params:
+  type: 'edm'        
+
+  sigma_min_pos: 0.0004               
+  sigma_max_pos: 80.0
+  sigma_data_pos: 2.5
+  P_mean_pos: -1.2
+  P_std_pos: 1.5       
+
+  sigma_min_feat: 0.0004
+  sigma_max_feat: 80.0   
+  sigma_data_feat: 0.6  
+  P_mean_feat: -1.2
+  P_std_feat: 1.5          
+
+  dilated_schedule: False  
+  tau_start: 0.6         
+  tau_end: 0.8                     
+  
+  # Training Parameters
+  rho: 7                          
+  # Sampling Parameters 
+  num_sampling_steps: 40         
+  
+  normalize_factors: [1, 1]  
+
+  scale_pocket_coords: True    
+  loss_x_weight: 10     
+
+# Eval params
+eval_epochs: 10
+visualize_sample_epoch: 50
+visualize_chain_epoch: 50
+eval_params:
+  n_eval_samples: 100
+  eval_batch_size: 100
+  smiles_file: '/media/kenthai/Research02/ThangD21/DIFF/data/data/data/processed_crossdock_noH_ca_only_temp/train_smiles.npy'
+  n_visualize_samples: 5
+  keep_frames: 100
