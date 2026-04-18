@@ -92,7 +92,7 @@ if __name__ == "__main__":
 
     logger = pl.loggers.WandbLogger(
         save_dir=args.logdir,
-        project='ligand-pocket-condition-edm-mace',
+        project='SphericalDiff',
         group=args.dataset,
         name=args.run_name,
         id=args.run_name,

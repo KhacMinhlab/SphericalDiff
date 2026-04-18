@@ -1,4 +1,4 @@
-run_name: 'SE3-cond-CA-MCAE_EDM-scalepocket-bayes-v5'
+run_name: 'SE3-cond-CA-SphericalDiff'
 logdir: '/media/kenthai/Research02/ThangD21/DIFF/logs/train'
 wandb_params:
   mode: 'online'
