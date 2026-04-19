@@ -56,8 +56,6 @@
 ## System Requirements
 
 ### OS Requirements
-This package supports **Linux**. Tested on:
-`AlmaLinux 8.9 (Midnight Oncilla)`
 
 Developed and tested under **Python 3.10.x**. Refer to `environment.yaml` for the complete pinned dependency list.
 
