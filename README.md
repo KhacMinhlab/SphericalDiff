@@ -168,12 +168,12 @@ python generate_ligands.py <checkpoint>.ckpt \
 
 **Start a new training run:**
 ```bash
-python -u train.py config=ca_config_edm_mace_independent.yml
+python -u train.py --config configs/ca_config_sphericaldiff.yml
 ```
 
 **Resume from a checkpoint:**
 ```bash
-python -u train.py config=ca_config_edm_mace_independent.yml resume=<checkpoint>.ckpt
+python -u train.py --config configs/ca_config_sphericaldiff.yml --resume <checkpoint>.ckpt
 ```
 
 Key training hyperparameters are managed through Hydra config files. A reference configuration for the CA-pocket EDM+MACE model is provided in `ca_config_edm_mace_independent.yml`.
