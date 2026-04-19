@@ -11,11 +11,11 @@
 
 ## Overview
 
-**SphericalDiff** is a structure-based drug design (**SBDD**) model that generates chemically valid, geometrically accurate 3D ligand molecules conditioned on target protein binding pockets. The model couples an **Elucidated Diffusion Model (EDM)** framework with a novel **MACE-inspired Spherical Harmonic Equivariant GNN** backbone (`EGNN_Spherical`), enabling expressive, many-body SE(3)-equivariant message passing with separate noise schedules for atomic coordinates and atom-type features.
+**SphericalDiff** is a structure-based drug design (**SBDD**) model that generates chemically valid, geometrically accurate 3D ligand molecules conditioned on target protein binding pockets. The model couples an **Elucidated Diffusion Model (EDM)** framework with a novel **MACE-inspired Spherical Harmonic Equivariant GNN** backbone (`EGNN_Spherical`), enabling expressive, many-body E(3)-equivariant message passing with separate noise schedules for atomic coordinates and atom-type features.
 
 <div align="center">
 
-> *"Generating 3D drug-like molecules directly in binding pockets via SE(3)-equivariant many-body diffusion with spherical harmonic representations."*
+> *"Generating 3D drug-like molecules directly in binding pockets via E(3)-equivariant many-body diffusion with spherical harmonic representations."*
 
 <img src="image/Abstract.png" alt="SphericalDiff Architecture Overview" width="800"/> 
 
