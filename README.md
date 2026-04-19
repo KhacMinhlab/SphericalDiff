@@ -159,8 +159,8 @@ python generate_ligands.py <checkpoint>.ckpt \
 | `--sanitize` | Remove chemically invalid molecules post-sampling |
 | `--relax` | Relax generated structures in a force field |
 | `--all_frags` | Retain all disconnected fragments |
-| `--resamplings` | Number of inpainting resamplings (non-conditional models only) |
-| `--jump_length` | Jump length for inpainting schedule (non-conditional models only) |
+| `--resamplings` | Number of inpainting resamplings |
+
 
 ---
 
