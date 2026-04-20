@@ -1,4 +1,4 @@
-name: diff_sh
+name: SphericalDiff
 channels:
   - nvidia
   - dglteam
