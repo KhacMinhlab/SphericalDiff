@@ -11,15 +11,24 @@
 
 ## Overview
 
-**SphericalDiff** is a structure-based drug design (**SBDD**) model that generates chemically valid, geometrically accurate 3D ligand molecules conditioned on target protein binding pockets. The model couples an **Elucidated Diffusion Model (EDM)** framework with a novel **MACE-inspired Spherical Harmonic Equivariant GNN** backbone (`EGNN_Spherical`), enabling expressive, many-body SE(3)-equivariant message passing with separate noise schedules for atomic coordinates and atom-type features.
+**SphericalDiff** is a structure-based drug design (**SBDD**) model that generates chemically valid, geometrically accurate 3D ligand molecules conditioned on target protein binding pockets. The model couples an **Elucidated Diffusion Model (EDM)** framework with a novel **MACE-many-body atomic cluster expansion** backbone (`EGNN_Spherical`), enabling expressive, many-body E(3)-equivariant message passing with separate noise schedules for atomic coordinates and atom-type features.
 
 <div align="center">
 
-> *"Generating 3D drug-like molecules directly in binding pockets via SE(3)-equivariant many-body diffusion with spherical harmonic representations."*
+> *"Generating 3D drug-like molecules directly in binding pockets via E(3)-equivariant many-body diffusion with spherical harmonic representations."*
 
 <img src="image/Abstract.png" alt="SphericalDiff Architecture Overview" width="800"/> 
 
-<video src="image\Visual.mp4" autoplay loop muted playsinline width="100%"></video>
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/3eeea996-c39d-4ac6-9d7c-f13b1e633a28" 
+         autoplay 
+         loop 
+         muted 
+         playsinline 
+         preload="auto" 
+         width="100%">
+  </video>
+</div>
 </div>
 
 ---
@@ -47,8 +56,6 @@
 ## System Requirements
 
 ### OS Requirements
-This package supports **Linux**. Tested on:
-`AlmaLinux 8.9 (Midnight Oncilla)`
 
 Developed and tested under **Python 3.10.x**. Refer to `environment.yaml` for the complete pinned dependency list.
 
@@ -58,7 +65,7 @@ Developed and tested under **Python 3.10.x**. Refer to `environment.yaml` for th
 
 **Clone and install dependencies**
 ```bash
-git clone https://github.com/<your-username>/SphericalDiff
+git clone https://github.com/KhacMinhlab/SphericalDiff
 cd SphericalDiff
 
 conda env create -f environment.yaml
@@ -150,8 +157,8 @@ python generate_ligands.py <checkpoint>.ckpt \
 | `--sanitize` | Remove chemically invalid molecules post-sampling |
 | `--relax` | Relax generated structures in a force field |
 | `--all_frags` | Retain all disconnected fragments |
-| `--resamplings` | Number of inpainting resamplings (non-conditional models only) |
-| `--jump_length` | Jump length for inpainting schedule (non-conditional models only) |
+| `--resamplings` | Number of inpainting resamplings |
+
 
 ---
 
@@ -159,12 +166,12 @@ python generate_ligands.py <checkpoint>.ckpt \
 
 **Start a new training run:**
 ```bash
-python -u train.py config=ca_config_edm_mace_independent.yml
+python -u train.py --config configs/ca_config_sphericaldiff.yml
 ```
 
 **Resume from a checkpoint:**
 ```bash
-python -u train.py config=ca_config_edm_mace_independent.yml resume=<checkpoint>.ckpt
+python -u train.py --config configs/ca_config_sphericaldiff.yml --resume <checkpoint>.ckpt
 ```
 
 Key training hyperparameters are managed through Hydra config files. A reference configuration for the CA-pocket EDM+MACE model is provided in `ca_config_edm_mace_independent.yml`.
