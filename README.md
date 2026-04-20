@@ -68,7 +68,7 @@ Developed and tested under **Python 3.10.x**. Refer to `environment.yaml` for th
 git clone https://github.com/KhacMinhlab/SphericalDiff
 cd SphericalDiff
 
-conda env create -f environment.yaml
+conda env create -f environment.yml
 conda activate SphericalDiff
 
 pip install -e .
