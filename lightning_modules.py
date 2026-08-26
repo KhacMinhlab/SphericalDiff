@@ -386,13 +386,9 @@ class LigandPocketEDM(pl.LightningModule):
 
         if self.augment_noise > 0:
             raise NotImplementedError
-            # Add noise eps ~ N(0, augment_noise) around points.
-            eps = sample_center_gravity_zero_gaussian(x.size(), x.device)
-            x = x + eps * args.augment_noise
 
         if self.augment_rotation:
             raise NotImplementedError
-            x = utils.random_rotation(x).detach()
 
         try:
             loss, info = self.forward(data)
@@ -1029,7 +1025,7 @@ class LigandPocketEDM(pl.LightningModule):
                                  from learned distribution if None
             sanitize           : RDKit sanitize flag passed to process_molecule
             largest_frag       : keep only largest fragment
-            relax_iter         : MMFF relaxation steps (0 = skip)
+            relax_iter         : UFF relaxation steps (0 = skip)
             num_sampling_steps : override Karras denoising steps
             n_nodes_bias       : additive bias on sampled node count
             n_nodes_min        : lower bound on node count
