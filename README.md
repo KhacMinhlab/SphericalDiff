@@ -22,7 +22,7 @@
 <img src="image/Abstract.png" alt="SphericalDiff Architecture Overview" width="800"/> 
 
 <div align="center">
-  <video src="https://github.com/user-attachments/assets/3eeea996-c39d-4ac6-9d7c-f13b1e633a28" 
+  <video src="https://github.com/user-attachments/assets/8d5e4779-6518-421e-932e-fffd143993d7" 
          autoplay 
          loop 
          muted 
