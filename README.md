@@ -1,5 +1,7 @@
 # SphericalDiff
 
+<div align="center">
+
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
 <a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
 <a href="https://hydra.cc/"><img alt="Config: Hydra" src="https://img.shields.io/badge/Config-Hydra-89b8cd"></a>
@@ -45,11 +47,8 @@
 - [Evaluation](#evaluation)
   - [Molecular Metrics](#molecular-metrics)
   - [Docking with QuickVina 2](#docking-with-quickvina-2)
-- [Configuration Reference](#configuration-reference)
 - [Acknowledgements](#acknowledgements)
 - [Citation](#citation)
-
----
 
 ---
 
@@ -57,7 +56,7 @@
 
 ### OS Requirements
 
-Developed and tested under **Python 3.10.x**. Refer to `environment.yaml` for the complete pinned dependency list.
+Developed and tested under **Python 3.10.x**. Refer to `environment.yml` for the complete pinned dependency list.
 
 ---
 
@@ -68,19 +67,15 @@ Developed and tested under **Python 3.10.x**. Refer to `environment.yaml` for th
 git clone https://github.com/KhacMinhlab/SphericalDiff
 cd SphericalDiff
 
-conda env create -f environment.yaml
+conda env create -f environment.yml
 conda activate SphericalDiff
 
-pip install -e .
 ```
 
 **Download model checkpoints**
-```bash
-# From your checkpoint host (e.g. Zenodo or HuggingFace)
-wget https://<your-checkpoint-url>/SphericalDiff_Checkpoints.tar.gz
-tar -xzf SphericalDiff_Checkpoints.tar.gz
-rm SphericalDiff_Checkpoints.tar.gz
-```
+
+Model weights, processed BindingMOAD testset, filtering report, and associated case-study files are hosted on Zenodo (DOI: 10.5281/zenodo.22054043). 
+
 
 ### QuickVina 2 (for docking evaluation)
 ```bash
@@ -103,7 +98,7 @@ mamba create -n mgltools -c bioconda mgltools
 Download and extract the dataset following the instructions from [Pocket2Mol](https://github.com/pengxingang/Pocket2Mol/tree/main/data). Then process the raw data:
 
 ```bash
-python process_crossdock.py <crossdocked_dir> --no_H
+python scripts/process_crossdock.py <crossdocked_dir> --no_H
 ```
 
 The processed dataset will be saved with C-alpha only pocket representations by default (matching the `CA` pocket mode in the config).
@@ -122,43 +117,100 @@ unzip every_part_b.zip
 
 **Process the raw data:**
 ```bash
-python process_bindingmoad.py <bindingmoad_dir>
+python scripts/process_bindingmoad.py <bindingmoad_dir>
 
 # To suppress RDKit / BioPython warnings:
-python -W ignore process_bindingmoad.py <bindingmoad_dir>
+python -W ignore scripts/process_bindingmoad.py <bindingmoad_dir>
 ```
 
 ---
 
 ## Demo
 
+<div align="center">
+  <video src="image/Sampling%20Process.mp4"
+         autoplay
+         loop
+         muted
+         playsinline
+         preload="auto"
+         width="100%">
+  </video>
+</div>
+
 ### Generate molecules for a given binding pocket
 
+The generation script supports two pocket-definition modes and an optional two-phase inpainting pipeline (Phase-1 generation, optional Phase-2 fragment growing/refinement).
+
+**By explicit pocket residues:**
 ```bash
-python generate_ligands.py <checkpoint>.ckpt \
+python generate_ligands.py \
+    --checkpoint <checkpoint>.ckpt \
     --pdbfile <protein>.pdb \
-    --outdir results/ \
-    --resi_list A:1 A:2 A:3 A:4 A:5 A:6 A:7
+    --pocket_ids A:1 A:2 A:3 A:4 A:5 A:6 A:7 \
+    --outfile results/generated.sdf
 ```
 
-Alternatively, specify the pocket via a reference ligand:
+**By reference ligand (defines the pocket via distance cutoff):**
 ```bash
-python generate_ligands.py <checkpoint>.ckpt \
+python generate_ligands.py \
+    --checkpoint <checkpoint>.ckpt \
     --pdbfile <protein>.pdb \
-    --outdir results/ \
-    --ref_ligand <chain>:<residue_id>
+    --ref_ligand <reference_ligand>.sdf \
+    --outfile results/generated.sdf
 ```
 
-**Optional flags:**
+**Growing molecules from a fixed anchor fragment (Phase-1 manual inpainting):**
+```bash
+python generate_ligands.py \
+    --checkpoint <checkpoint>.ckpt \
+    --pdbfile <protein>.pdb \
+    --ref_ligand <reference_ligand>.sdf \
+    --fix_atoms <anchor_fragment>.sdf \
+    --outfile <output>.sdf \
+    --n_samples <N> \
+    --n_nodes_min <min_heavy_atoms> \
+    --resamplings <r> \
+    --sanitize \
+    --relax \
+    --largest_frag
+```
+**Required arguments:**
 
 | Flag | Description |
 |------|-------------|
-| `--n_samples` | Number of molecules to sample (default: 100) |
-| `--sanitize` | Remove chemically invalid molecules post-sampling |
-| `--relax` | Relax generated structures in a force field |
-| `--all_frags` | Retain all disconnected fragments |
-| `--resamplings` | Number of inpainting resamplings |
+| `--checkpoint` | Path to the LigandPocketEDM checkpoint (`.ckpt`). |
+| `--pdbfile` | Path to the target protein PDB file. |
+| `--outfile` | Output SDF file path for the generated molecules (a file, not a directory). |
 
+**Pocket definition (choose one):**
+
+| Flag | Description |
+|------|-------------|
+| `--ref_ligand` | SDF path, or `<chain>:<resi>` — defines the pocket via distance cutoff around the reference ligand. |
+| `--pocket_ids` | Explicit pocket residues as `<chain>:<resi>` pairs (e.g. `A:100 A:101 A:150`), bypassing the distance-cutoff pocket definition. |
+
+**Phase-1 manual inpainting (optional):**
+
+| Flag | Description |
+|------|-------------|
+| `--fix_atoms` | A single SDF path → fixes all atoms in that file during generation. Atom names (e.g. `C1 N2`) → fixes those specific atoms from the `--ref_ligand` PDB residue instead. |
+| `--add_n_nodes` | Number of extra atoms to generate on top of the fixed substructure. If omitted, the model samples a total size from its learned p(N_lig \| N_pocket) distribution. |
+
+**Sampling configuration (optional):**
+
+| Flag | Description |
+|------|-------------|
+| `--n_samples` | Target number of valid molecules to collect (default: 100). |
+| `--batch_size` | Molecules requested per Phase-1 batch (default: 60). |
+| `--num_sampling_steps` | Karras denoising steps (default: 40). |
+| `--n_nodes_min` | Minimum atom count for sampled molecule size. |
+| `--resamplings` | Repaint r for Phase-1 (default: 1). |
+| `--sanitize` | Apply RDKit sanitization to generated molecules. |
+| `--relax` | Apply 200-step MMFF relaxation to generated structures. |
+| `--largest_frag` | Keep only the largest fragment from each generated molecule. |
+
+**Phase-2 conditional inpainting (optional, enable with `--refine_fragments`):** grows small/disconnected Phase-1 outputs. See `python generate_ligands.py --help` for the full set of Phase-2 and advanced sampling flags (fragment-growing thresholds, repulsion guidance, Karras noise-schedule overrides).
 
 ---
 
@@ -174,7 +226,7 @@ python -u train.py --config configs/ca_config_sphericaldiff.yml
 python -u train.py --config configs/ca_config_sphericaldiff.yml --resume <checkpoint>.ckpt
 ```
 
-Key training hyperparameters are managed through Hydra config files. A reference configuration for the CA-pocket EDM+MACE model is provided in `ca_config_edm_mace_independent.yml`.
+ The reference configuration for the CA-pocket EDM+MACE model is `configs/ca_config_sphericaldiff.yml`. 
 
 ---
 
@@ -194,8 +246,15 @@ The `--fix_n_nodes` flag constrains the sampled molecules to have the same numbe
 
 ### Molecular Metrics
 
-To compute QED, SA, LogP, Lipinski, and diversity scores:
+To compute QED, SA, LogP, Lipinski, and diversity scores, use `eval_ligands.py`:
 
+```bash
+python eval_ligands.py <input_directory> <output_directory>
+```
+
+`<input_directory>` is scanned recursively for `.sdf` files (one file per pocket); results are written to a `metrics_<uuid>.csv` file in `<output_directory>` with per-molecule QED, SA, LogP, Lipinski, and per-pocket diversity.
+
+Equivalently, from Python:
 ```python
 from analysis.metrics import MoleculeProperties
 
