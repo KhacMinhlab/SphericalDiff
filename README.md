@@ -74,7 +74,7 @@ conda activate SphericalDiff
 
 **Download model checkpoints**
 
-Model weights, processed BindingMOAD testset, filtering report, and associated case-study files are hosted on Zenodo (DOI: 10.5281/zenodo.22054043). 
+Model weights, processed BindingMOAD testset, filtering report, and associated case-study files are hosted on Zenodo (DOI: [10.5281/zenodo.21989845](https://doi.org/10.5281/zenodo.21989845)). 
 
 
 ### QuickVina 2 (for docking evaluation)
