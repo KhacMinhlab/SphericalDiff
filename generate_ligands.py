@@ -97,12 +97,15 @@ def assess_and_route_molecules(
     p1_valid: List[Chem.Mol],
     min_heavy_atoms: int = 15,
     sanitize: bool = False,
+    n_fixed: int = 0,
 ) -> Tuple[List[dict], List[Chem.Mol], int]:
     """
     Assess Phase-1 molecules and route them for Phase-2 refinement.
 
     Strategy (no linking):
-        1. Multi-fragment molecules → extract largest fragment first
+        1. Multi-fragment molecules → extract the fragment holding the fixed
+           scaffold (atom 0) when inpainting (n_fixed > 0); otherwise the
+           largest fragment
         2. Single fragment with < min_heavy_atoms → Group B (grow)
         3. Single fragment with ≥ min_heavy_atoms → Group C (pass)
 
@@ -118,14 +121,22 @@ def assess_and_route_molecules(
 
     for mol in p1_valid:
         try:
-            frags       = Chem.GetMolFrags(mol, asMols=True, sanitizeFrags=False)
-            num_frags   = len(frags)
+            frag_indices = Chem.GetMolFrags(mol, asMols=False)
+            frags        = Chem.GetMolFrags(mol, asMols=True, sanitizeFrags=False)
+            num_frags    = len(frags)
         except Exception:
             continue  # skip molecules that RDKit cannot analyse
 
-        # ── Step 1: If multi-fragment, keep only the largest fragment ──
+        # ── Step 1: If multi-fragment, keep the fragment holding the fixed
+        # scaffold (atom 0) when inpainting; otherwise keep the largest ──
         if num_frags > 1:
-            mol = max(frags, key=lambda m: m.GetNumAtoms())
+            if n_fixed > 0:
+                mol = next(
+                    (f for f, idx in zip(frags, frag_indices) if 0 in idx),
+                    max(frags, key=lambda m: m.GetNumAtoms()),
+                )
+            else:
+                mol = max(frags, key=lambda m: m.GetNumAtoms())
             if sanitize:
                 try:
                     Chem.SanitizeMol(mol)
@@ -354,10 +365,6 @@ def resolve_pocket(model, pdb_file, ref_ligand, pocket_ids):
     pocket_single = model.prepare_pocket(residues, repeats=1)
     return pocket_single
 
-
-# ╔═══════════════════════════════════════════════════════════════════════════╗
-# ║  NEW HELPER: Smart post-processing (constrained relax for inpainting)   ║
-# ╚═══════════════════════════════════════════════════════════════════════════╝
 
 def _postprocess_molecule(
     mol: Chem.Mol,
@@ -768,6 +775,7 @@ if __name__ == "__main__":
             p1_all_valid,
             min_heavy_atoms = args.min_heavy_atoms,
             sanitize        = args.sanitize,
+            n_fixed         = n_fixed,
         )
         n_b, n_c = len(group_b), len(group_c)
         print(f"[Phase 2]  Initial routing (no-link strategy):")
@@ -857,6 +865,7 @@ if __name__ == "__main__":
                 round_output,
                 min_heavy_atoms = args.min_heavy_atoms,
                 sanitize        = args.sanitize,
+                n_fixed         = n_fixed,
             )
 
             n_good    = len(now_good)
