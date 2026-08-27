@@ -26,7 +26,6 @@ from analysis.visualization import save_xyz_file, visualize, visualize_chain
 from analysis.metrics import BasicMolecularMetrics, CategoricalDistribution, \
     MoleculeProperties
 from analysis.molecule_builder import build_molecule, process_molecule
-from analysis.docking import smina_score
 import matplotlib.pyplot as plt
 import csv
 
@@ -94,8 +93,13 @@ class LigandPocketEDM(pl.LightningModule):
             if self.pocket_representation == 'CA' or self.pocket_representation == 'backbone' \
             else self.dataset_info['atom_decoder']
 
-        smiles_list = None if eval_params.smiles_file is None \
-            else np.load(eval_params.smiles_file)
+        smiles_list = None
+        if eval_params.smiles_file is not None:
+            if Path(eval_params.smiles_file).exists():
+                smiles_list = np.load(eval_params.smiles_file)
+            else:
+                print(f"WARNING: smiles_file '{eval_params.smiles_file}' not "
+                      f"found, skipping novelty metric.")
         self.ligand_metrics = BasicMolecularMetrics(self.dataset_info,
                                                     smiles_list)
         self.molecule_properties = MoleculeProperties()
@@ -562,6 +566,7 @@ class LigandPocketEDM(pl.LightningModule):
             valid_receptors = [r for r in receptors if r is not None]
             if len(connected_mols) > 0 and len(valid_receptors) > 0:
                 try:
+                    from analysis.docking import smina_score
                     scores = smina_score(connected_mols, receptors)
                     mean_score = np.mean(scores)
                     out['smina_score'] = mean_score

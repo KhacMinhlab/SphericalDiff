@@ -497,8 +497,8 @@ if __name__ == "__main__":
                         help="The number of atoms adding in sampling distribution.")
     parser.add_argument("--n_nodes_min",        type=int, default=0,
                         help="The number of minimum atom.")
-    parser.add_argument("--resamplings",        type=int, default=1,
-                        help="Repaint r for Phase-1 (default: 1).")
+    parser.add_argument("--resamplings",        type=int, default=10,
+                        help="Repaint r for Phase-1 (default: 10).")
     parser.add_argument("--sanitize",           action="store_true",
                         help="Apply RDKit sanitization in process_molecule.")
     parser.add_argument("--relax",              action="store_true",

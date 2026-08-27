@@ -205,7 +205,7 @@ python generate_ligands.py \
 | `--batch_size` | Molecules requested per Phase-1 batch (default: 60). |
 | `--num_sampling_steps` | Karras denoising steps (default: 40). |
 | `--n_nodes_min` | Minimum atom count for sampled molecule size. |
-| `--resamplings` | Repaint r for Phase-1 (default: 1). |
+| `--resamplings` | Repaint r for Phase-1 (default: 10). |
 | `--sanitize` | Apply RDKit sanitization to generated molecules. |
 | `--relax` | Apply 200-step MMFF relaxation to generated structures. |
 | `--largest_frag` | Keep only the largest fragment from each generated molecule. |
