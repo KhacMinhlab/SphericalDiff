@@ -105,11 +105,13 @@ The processed dataset will be saved with C-alpha only pocket representations by 
 
 ### Binding MOAD
 
+> **Note:** This Binding MOAD download/processing pipeline is sourced from [GCDM-SBDD](https://github.com/BioinfoMachineLearning/GCDM-SBDD), which we gratefully acknowledge. Please refer to their repository for further details.
+
 **Download the dataset:**
 ```bash
-wget https://zenodo.org/record/<record_id>/files/every_part_a.zip
-wget https://zenodo.org/record/<record_id>/files/every_part_b.zip
-wget https://zenodo.org/record/<record_id>/files/every.csv
+wget https://zenodo.org/record/13375913/files/every_part_a.zip
+wget https://zenodo.org/record/13375913/files/every_part_b.zip
+wget https://zenodo.org/record/13375913/files/every.csv
 
 unzip every_part_a.zip
 unzip every_part_b.zip
