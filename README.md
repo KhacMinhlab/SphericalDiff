@@ -177,6 +177,9 @@ python generate_ligands.py \
     --relax \
     --largest_frag
 ```
+
+> **Note:** When using `--fix_atoms`, always pass `--largest_frag` too. The pipeline already guarantees the final output keeps only the fragment connected to the fixed scaffold regardless of this flag, but without it, the per-molecule constrained relaxation (MMFF/UFF) runs *before* disconnected junk fragments are trimmed — so they can still interfere with the force-field minimization via non-bonded terms. Passing `--largest_frag` trims them first, giving cleaner and slightly faster relaxation.
+
 **Required arguments:**
 
 | Flag | Description |
