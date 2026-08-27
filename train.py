@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 import yaml
 import numpy as np
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
-from lightning_modules import LigandPocketDDPM
+from lightning_modules import LigandPocketEDM
 
 
 def merge_args_and_yaml(args, config_dict):
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     out_dir = Path(args.logdir, args.run_name)
     histogram_file = Path(args.datadir, 'size_distribution.npy')
     histogram = np.load(histogram_file).tolist()
-    pl_module = LigandPocketDDPM(
+    pl_module = LigandPocketEDM(
         outdir=out_dir,
         dataset=args.dataset,
         datadir=args.datadir,

@@ -13,7 +13,7 @@ from openbabel import openbabel
 openbabel.obErrorLog.StopLogging()  # suppress OpenBabel messages
 
 import utils
-from lightning_modules import LigandPocketDDPM
+from lightning_modules import LigandPocketEDM
 from constants import FLOAT_TYPE, INT_TYPE
 from analysis.molecule_builder import build_molecule, process_molecule
 from analysis.metrics import MoleculeProperties
@@ -333,7 +333,7 @@ if __name__ == "__main__":
     top_k = args.top_k
 
     # Load model
-    model = LigandPocketDDPM.load_from_checkpoint(
+    model = LigandPocketEDM.load_from_checkpoint(
         args.checkpoint, map_location=device)
     model = model.to(device)
 
