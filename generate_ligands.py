@@ -30,6 +30,9 @@ except ImportError:
 def prepare_from_sdf_files(sdf_files: list, atom_encoder: dict):
     ligand_coords = []
     atom_one_hot  = []
+    bonds         = []  # (atom_i, atom_j, bond_type), indices into the
+                        # concatenated coord/one_hot tensors below
+    n_seen = 0
 
     for file in sdf_files:
         supplier = Chem.SDMolSupplier(str(file), sanitize=False)
@@ -49,6 +52,13 @@ def prepare_from_sdf_files(sdf_files: list, atom_encoder: dict):
             atom_one_hot.append(
                 F.one_hot(types, num_classes=len(atom_encoder))
             )
+            for bond in rdmol.GetBonds():
+                bonds.append((
+                    n_seen + bond.GetBeginAtomIdx(),
+                    n_seen + bond.GetEndAtomIdx(),
+                    bond.GetBondType(),
+                ))
+            n_seen += rdmol.GetNumAtoms()
             n_read += 1
 
         if n_read == 0:
@@ -57,7 +67,8 @@ def prepare_from_sdf_files(sdf_files: list, atom_encoder: dict):
             )
         print(f"[info]  Read {n_read} molecule block(s) from {file}")
 
-    return torch.cat(ligand_coords, dim=0), torch.cat(atom_one_hot, dim=0)
+    return (torch.cat(ligand_coords, dim=0), torch.cat(atom_one_hot, dim=0),
+            bonds)
 
 
 def prepare_ligand_from_pdb(biopython_atoms, atom_encoder: dict):
@@ -75,9 +86,17 @@ def prepare_ligand_from_pdb(biopython_atoms, atom_encoder: dict):
 
 def prepare_substructure(ref_ligand: str, fix_atoms: list,
                          pdb_model, atom_encoder: dict):
-    """Return (coords, one_hot) of the atoms to be held fixed."""
+    """
+    Return (coords, one_hot, bonds) of the atoms to be held fixed.
+
+    ``bonds`` is a list of (atom_i, atom_j, bond_type) taken from the
+    original SDF bond table when ``--fix_atoms`` is an SDF file — this lets
+    the final molecule keep the scaffold's true connectivity instead of
+    re-guessing it from geometry. It is None for the PDB-residue-by-atom-name
+    path, where no reliable original bond table is available.
+    """
     if fix_atoms[0].endswith(".sdf"):
-        coord, one_hot = prepare_from_sdf_files(fix_atoms, atom_encoder)
+        coord, one_hot, bonds = prepare_from_sdf_files(fix_atoms, atom_encoder)
     else:
         chain, resi = ref_ligand.split(":")
         ligand      = utils.get_residue_with_resi(pdb_model[chain], int(resi))
@@ -89,8 +108,9 @@ def prepare_substructure(ref_ligand: str, fix_atoms: list,
                 f"in residue {ref_ligand}."
             )
         coord, one_hot = prepare_ligand_from_pdb(fixed_atoms, atom_encoder)
+        bonds = None
 
-    return coord, one_hot
+    return coord, one_hot, bonds
 
 
 def assess_and_route_molecules(
@@ -580,10 +600,11 @@ if __name__ == "__main__":
     # ── Phase-1 inpainting setup (optional) ───────────────────────────────────
     fixed_coord   = None
     fixed_one_hot = None
+    fixed_bonds   = None
 
     if use_inpainting:
         pdb_model = PDBParser(QUIET=True).get_structure("", args.pdbfile)[0]
-        fixed_coord, fixed_one_hot = prepare_substructure(
+        fixed_coord, fixed_one_hot, fixed_bonds = prepare_substructure(
             args.ref_ligand, args.fix_atoms, pdb_model, model.lig_type_encoder,
         )
         n_fixed = fixed_coord.shape[0]
@@ -713,6 +734,7 @@ if __name__ == "__main__":
                     repulsion_cutoff   = args.repulsion_cutoff,   # ← NEW
                     ligand_inp         = ligand_inp_p1,
                     lig_mask_fixed     = lig_mask_fixed_p1,
+                    fixed_bonds        = [fixed_bonds] * batch,
                     **karras_kwargs,
                 )
             else:

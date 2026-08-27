@@ -159,6 +159,35 @@ def build_molecule(positions, atom_types, dataset_info, add_coords=False,
     return mol
 
 
+def apply_known_bonds(mol, bonds):
+    """
+    Restore known bonds among a molecule's fixed atoms, overriding whatever
+    build_molecule's geometry-based bond perception guessed for those atom
+    pairs. Used for inpainting: the fixed scaffold's true connectivity
+    (read from its original SDF) is known exactly and should not be
+    re-guessed from 3D distances like the newly generated atoms are.
+
+    Args:
+        mol: RDKit Mol/RWMol (as returned by build_molecule)
+        bonds: list of (atom_i, atom_j, rdkit_bond_type) using mol's atom
+            indexing
+    Returns:
+        RWMol with the given bonds set to their known type (added if
+        missing, corrected if a different type was guessed)
+    """
+    rwmol = Chem.RWMol(mol)
+    n_atoms = rwmol.GetNumAtoms()
+    for i, j, bond_type in bonds:
+        if i >= n_atoms or j >= n_atoms:
+            continue
+        existing = rwmol.GetBondBetweenAtoms(i, j)
+        if existing is None:
+            rwmol.AddBond(i, j, bond_type)
+        elif existing.GetBondType() != bond_type:
+            existing.SetBondType(bond_type)
+    return rwmol
+
+
 def process_molecule(rdmol, add_hydrogens=False, sanitize=False, relax_iter=0,
                      largest_frag=False):
     """

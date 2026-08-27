@@ -159,8 +159,10 @@ def batch_to_list(data, batch_mask):
     #     data_list.append(data[batch_mask == i])
     # return data_list
 
-    # make sure batch_mask is increasing
-    idx = torch.argsort(batch_mask)
+    # make sure batch_mask is increasing; stable=True keeps each sample's
+    # atoms in their original relative order (needed wherever downstream
+    # code assumes a fixed atom-index convention, e.g. inpainting)
+    idx = torch.argsort(batch_mask, stable=True)
     batch_mask = batch_mask[idx]
     data = data[idx]
 

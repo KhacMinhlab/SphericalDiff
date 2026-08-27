@@ -25,7 +25,8 @@ from utils import AlphaFoldLRScheduler
 from analysis.visualization import save_xyz_file, visualize, visualize_chain
 from analysis.metrics import BasicMolecularMetrics, CategoricalDistribution, \
     MoleculeProperties
-from analysis.molecule_builder import build_molecule, process_molecule
+from analysis.molecule_builder import build_molecule, process_molecule, \
+    apply_known_bonds
 import matplotlib.pyplot as plt
 import csv
 
@@ -1003,9 +1004,10 @@ class LigandPocketEDM(pl.LightningModule):
                      ligand_inp=None,
                      lig_mask_fixed=None,
                      resamplings=1,
-                     jump_length=1,              
-                     repulsion_scale=0.0,        
-                     repulsion_cutoff=1.2, 
+                     jump_length=1,
+                     repulsion_scale=0.0,
+                     repulsion_cutoff=1.2,
+                     fixed_bonds=None,
                      ):
         """
         Generate ligands given a pocket using EDM sampling.
@@ -1042,6 +1044,15 @@ class LigandPocketEDM(pl.LightningModule):
             lig_mask_fixed     : float tensor [N_total_lig], 1=fixed 0=generate.
                                  Must match ligand_inp atom ordering exactly.
             resamplings        : Repaint r — inner re-noise cycles per step
+            fixed_bonds        : per-sample list (length n_samples) of known
+                                 bonds for the fixed atoms, each a list of
+                                 (atom_i, atom_j, rdkit_bond_type) using the
+                                 same atom ordering as ligand_inp/lig_mask_fixed.
+                                 An entry may be None to skip injection for
+                                 that sample. Used to restore the fixed
+                                 scaffold's true connectivity after
+                                 build_molecule() re-derives all bonds from
+                                 geometry (which can otherwise fragment it).
 
         Returns:
             list of RDKit Mol objects (length <= n_samples)
@@ -1139,9 +1150,12 @@ class LigandPocketEDM(pl.LightningModule):
                 len(num_nodes_lig), num_nodes_lig, self.device).cpu()
 
         molecules = []
-        for mol_pc in zip(utils.batch_to_list(x, lig_mask),
-                        utils.batch_to_list(atom_type, lig_mask)):
+        for i, mol_pc in enumerate(zip(utils.batch_to_list(x, lig_mask),
+                        utils.batch_to_list(atom_type, lig_mask))):
             mol = build_molecule(*mol_pc, self.dataset_info, add_coords=True)
+            sample_bonds = fixed_bonds[i] if fixed_bonds is not None else None
+            if sample_bonds:
+                mol = apply_known_bonds(mol, sample_bonds)
             mol = process_molecule(mol,
                                 add_hydrogens=False,
                                 sanitize=sanitize,
