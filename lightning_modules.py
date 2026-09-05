@@ -168,6 +168,8 @@ class LigandPocketEDM(pl.LightningModule):
             lmax=egnn_params.__dict__.get('lmax', 2),
             avg_num_neighbors=egnn_params.__dict__.get('avg_num_neighbors', 28.0),
             max_radius=egnn_params.__dict__.get('max_radius', 10.0),
+            k_neighbors=egnn_params.__dict__.get('k_neighbors', 16),
+            k_neighbors_max=egnn_params.__dict__.get('k_neighbors_max', 32),
             scale_pocket_coords=getattr(diffusion_params, 'scale_pocket_coords', True)
         )
         self.model = EDM(

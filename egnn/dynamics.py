@@ -35,6 +35,7 @@ class EGNNDynamics(nn.Module):
                  max_correlation_order=3,
                  weight_mode='True',
                  avg_num_neighbors=10.0, max_radius=10.0,
+                 k_neighbors=16, k_neighbors_max=32,
                  scale_pocket_coords=True):
         super().__init__()
         self.mode = mode
@@ -50,6 +51,8 @@ class EGNNDynamics(nn.Module):
         self.max_correlation_order = max_correlation_order
         self.rbf_type = rbf_type
         self.scale_pocket_coords = scale_pocket_coords
+        self.k_neighbors = k_neighbors
+        self.k_neighbors_max = k_neighbors_max
 
         self.time_emb_x = FourierTimeEmbedding(hidden_nf)
         self.time_emb_h = FourierTimeEmbedding(hidden_nf)
@@ -363,11 +366,11 @@ class EGNNDynamics(nn.Module):
         all_lig_indices = []
         all_poc_indices = []
         
-        base_k = getattr(self, 'k_neighbors', 16)
+        base_k = self.k_neighbors
         if noise_scale is not None:
             max_noise = noise_scale.max().item() if noise_scale.numel() > 0 else 0
             adaptive_k = base_k + int(max_noise / 10)
-            k_target = min(adaptive_k, 32)
+            k_target = min(adaptive_k, self.k_neighbors_max)
         else:
             k_target = base_k
 

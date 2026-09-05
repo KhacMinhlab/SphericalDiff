@@ -1,17 +1,17 @@
-run_name: 'E3-cond-CA-SphericalDiff'
+run_name: 'E3-cond-FullAtom-SphericalDiff'
 logdir: '/media/kenthai/Research02/ThangD21/DIFF/logs/train'
 wandb_params:
   mode: 'online'
   entity: 'lethang08082003-github'
-dataset: 'crossdock'
-datadir: '/media/kenthai/Research02/ThangD21/DIFF/data/data/data/processed_crossdock_noH_ca_only_temp'
+dataset: 'crossdock_full'
+datadir: 'data/processed_crossdock_noH_full_temp'
 enable_progress_bar: True
 num_sanity_val_steps: 0
 
 # Training params
 mode: 'pocket_conditioning'
-pocket_representation: 'CA'
-batch_size: 32 
+pocket_representation: 'full-atom'
+batch_size: 64 
 lr: 1.0e-4
 n_epochs: 1000
 num_workers: 1
@@ -57,8 +57,8 @@ egnn_params:
 
   block_type: 'mace'
   max_correlation_order: 3
-  k_neighbors: 16
-  k_neighbors_max: 32
+  k_neighbors: 32
+  k_neighbors_max: 64
 
   # Edge cutoff parameters
   edge_cutoff_ligand: null
@@ -103,6 +103,6 @@ visualize_chain_epoch: 50
 eval_params:
   n_eval_samples: 100
   eval_batch_size: 100
-  smiles_file: '/media/kenthai/Research02/ThangD21/DIFF/data/data/data/processed_crossdock_noH_ca_only_temp/train_smiles.npy'
+  smiles_file: 'data/processed_crossdock_noH_full_temp/train_smiles.npy'
   n_visualize_samples: 5
   keep_frames: 100
